@@ -1,0 +1,19 @@
+body {
+    background-color: black;
+}
+
+canvas {
+  padding: 0;
+  margin: auto;
+  display: block;
+  position: relative;
+  border-style: solid;
+  border-width: thick;
+  border-color: white;
+  background-color: black;
+}
+
+#title {
+  text-align: center;
+  color:white;
+}
