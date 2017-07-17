@@ -12,15 +12,21 @@ var step = function() {
     update();
     render();
     animate(step);
+    ball.update(player.paddle, computer.paddle);
+  
 };
 
 var update = function() { 
     player.update();
+    computer.update();
+    ball.update(player.paddle, computer.paddle);
+    
 };
 
 var player = new Player();
 var computer = new Computer();
 var ball = new Ball(300, 200); //Ball start position
+
 
 var render = function() {
     context.fillStyle = "#000000";
@@ -28,6 +34,7 @@ var render = function() {
     player.render();
     computer.render();
     ball.render();
+
 };
 
 /*=============== Paddle ================ */
@@ -62,7 +69,7 @@ Paddle.prototype.move = function(x, y) {
 
 /*=============== Player ================ */
 function Player() {
-    this.paddle = new Paddle(10, 175, 10, 50);
+    this.paddle = new Paddle(580, 175, 10, 50);
 }
 
 Player.prototype.render = function() {
@@ -82,13 +89,26 @@ Player.prototype.update = function() {
     }
 };
 
-/*=============== CPU ================ */
+/*=============== CPU as manual player ================ */
 function Computer() {
-    this.paddle = new Paddle(580, 175, 10, 50);
+    this.paddle = new Paddle(10, 175, 10, 50);
 }
 
 Computer.prototype.render = function() {
     this.paddle.render();
+};
+
+Computer.prototype.update = function() {
+    for(var key in keysDown) {
+        var value = Number(key);
+        if(value == 37) { //left arrow
+            this.paddle.move(0, -4);
+        } else if (value == 39) { //right arrow
+            this.paddle.move(0, 4);
+        } else {
+            this.paddle.move(0,0);
+        }
+    }
 };
 
 
@@ -96,8 +116,8 @@ Computer.prototype.render = function() {
 function Ball(x, y) {
     this.x = x;
     this.y = y;
-    this.x_speed = 0;
-    this.y_speed = 3;
+    this.x_speed = 3;
+    this.y_speed = 0;
     this.radius = 5;
 }
 
@@ -107,6 +127,65 @@ Ball.prototype.render = function() {
     context.fillStyle = "#FFFFFF";
     context.fill();
 };
+
+Ball.prototype.update = function(paddle1, paddle2) {
+    this.x += this.x_speed;
+    this.y += this.y_speed;
+    var top_x = this.x - 5;
+    var top_y = this.y - 5;
+    var bottom_x = this.x + 5;
+    var bottom_y = this.y + 5;
+
+    //Ball colliding with top/bottom
+    if(this.y - 5 < 0) {
+        this.y = 5;
+        this.y_speed = -this.y_speed;
+    } else if (this.y + 5 > 400) {
+        this.y = 395;
+        this.y_speed = -this.y_speed;
+    }
+
+    //Reset ball on scoring
+    if(this.x < 0 || this.x > 600) { //point scored
+         this.x_speed = 3; //Reset direction
+         this.y_speed = 0; //Reset direction
+         this.x = 300; //reset position
+         this.y = 200; //reset position
+    }
+
+    //Colliding with a paddle
+
+    //console.log(paddle1)
+
+    // if(this.x <= 21){
+    //     if(Math.abs(this.y - paddle1.y) <= 20){
+    //         this.x_speed = -this.x_speed
+    //     }
+    // }
+
+    //console.log(paddle2)
+    //   if(this.x > 560 ) {
+    //      if(Math.abs(this.y - paddle2.y) < 100){
+    //          this.x_speed = -this.x_speed    
+    //      }
+    //   }
+    if(top_x > 300) {
+        if(top_x < (paddle1.x + paddle1.width) && bottom_x > paddle1.x && top_y < (paddle1.y + paddle1.height) && bottom_y > paddle1.y) {
+            // hit the player's paddle
+            this.x_speed = -3;
+            this.y_speed += (paddle1.y_speed / 2);
+            this.x += this.x_speed;
+        }
+    } else {
+        if(top_x < (paddle2.x + paddle2.width) && bottom_x > paddle2.x && top_y < (paddle2.y + paddle2.height) && bottom_y > paddle2.y) {
+            //hit the computer's paddle
+            this.x_speed = 3;
+            this.y_speed += (paddle2.y_speed / 2);
+            this.x += this.x_speed;
+        }
+    }   
+};
+
 
 /*=============== Displaying it all and event listeners ================ */
 window.onload = function() {
