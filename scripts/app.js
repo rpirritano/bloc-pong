@@ -18,7 +18,7 @@ var step = function() {
 
 var update = function() { 
     player.update();
-    computer.update();
+    computer.update(ball);
     ball.update(player.paddle, computer.paddle);
     
 };
@@ -89,7 +89,7 @@ Player.prototype.update = function() {
     }
 };
 
-/*=============== CPU as manual player ================ */
+/*=============== CPU player ================ */
 function Computer() {
     this.paddle = new Paddle(10, 175, 10, 50);
 }
@@ -98,16 +98,19 @@ Computer.prototype.render = function() {
     this.paddle.render();
 };
 
-Computer.prototype.update = function() {
-    for(var key in keysDown) {
-        var value = Number(key);
-        if(value == 37) { //left arrow
-            this.paddle.move(0, -4);
-        } else if (value == 39) { //right arrow
-            this.paddle.move(0, 4);
-        } else {
-            this.paddle.move(0,0);
-        }
+Computer.prototype.update = function(ball) {
+    var y_pos = ball.y;
+    var diff = -((this.paddle.y + (this.paddle.height / 2)) - y_pos);
+    if(diff < 0 && diff < -4) { // max speed up
+        diff = -5;
+    } else if(diff > 0 && diff > 4) { // max speed down
+        diff = 5;
+    }
+    this.paddle.move(0, diff);
+    if(this.paddle.y < 0) {
+        this.paddle.y = 0;
+    } else if (this.paddle.y + this.paddle.height > 400) {
+        this.paddle.y = 400 - this.paddle.height;
     }
 };
 
