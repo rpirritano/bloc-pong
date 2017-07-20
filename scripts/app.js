@@ -113,13 +113,14 @@ Computer.prototype.update = function(ball) {
         this.paddle.y = 400 - this.paddle.height;
     }
 };
+   
 
 
 /*=============== Ball ================ */
 function Ball(x, y) {
     this.x = x;
     this.y = y;
-    this.x_speed = 3;
+    this.x_speed = 2;
     this.y_speed = 0;
     this.radius = 5;
 }
@@ -150,7 +151,7 @@ Ball.prototype.update = function(paddle1, paddle2) {
 
     //Reset ball on scoring
     if(this.x < 0 || this.x > 600) { //point scored
-         this.x_speed = 3; //Reset direction
+         this.x_speed = 2; //Reset direction
          this.y_speed = 0; //Reset direction
          this.x = 300; //reset position
          this.y = 200; //reset position
@@ -158,15 +159,15 @@ Ball.prototype.update = function(paddle1, paddle2) {
 
     //Colliding with a paddle
 
-    //console.log(paddle1)
+    // console.log(paddle1)
 
-    // if(this.x <= 21){
+    // if(this.x >580){
     //     if(Math.abs(this.y - paddle1.y) <= 20){
-    //         this.x_speed = -this.x_speed
+    //         this.x_speed = -this.x_speed;
     //     }
     // }
 
-    //console.log(paddle2)
+    // //console.log(paddle2)
     //   if(this.x > 560 ) {
     //      if(Math.abs(this.y - paddle2.y) < 100){
     //          this.x_speed = -this.x_speed    
