@@ -18,7 +18,8 @@ var update = function() {
     player.update();
     computer.update(ball);
     ball.update(player.paddle, computer.paddle, scoreComputer, scorePlayer);
-
+    scoreComputer.update();
+    scorePlayer.update();
 };
 
 var player = new Player();
@@ -227,6 +228,20 @@ ScorePlayer.prototype.incrementPlayerScore = function() {
 
 ScoreComputer.prototype.incrementComputerScore = function() {
     this.computerScore++;
+}
+
+ScorePlayer.prototype.update = function() {
+    if(this.playerScore === 11) {
+        alert("You Won!");
+        location.reload();
+    }
+}
+
+ScoreComputer.prototype.update = function() {
+    if(this.computerScore === 11) {
+        alert("Computer Won!");
+        location.reload();
+    }
 }
 
 ScorePlayer.prototype.render = function() {
