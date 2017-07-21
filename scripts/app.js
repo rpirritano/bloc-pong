@@ -1,7 +1,7 @@
 var animate = window.requestAnimationFrame || 
             function(callback) { window.setTimeout(callback, 1000/60) };
 
-var canvas = document.createElement('canvas');
+var canvas = document.getElementById('canvas');
 var width = 600;
 var height = 400;
 canvas.width = width;
@@ -11,30 +11,38 @@ var context = canvas.getContext('2d');
 var step = function() {
     update();
     render();
-    animate(step);
-    ball.update(player.paddle, computer.paddle);
-  
+    animate(step);  
 };
 
 var update = function() { 
     player.update();
     computer.update(ball);
-    ball.update(player.paddle, computer.paddle);
-    
+    ball.update(player.paddle, computer.paddle, scoreComputer, scorePlayer);
+
 };
 
 var player = new Player();
 var computer = new Computer();
 var ball = new Ball(300, 200); //Ball start position
+var scoreComputer = new ScoreComputer();
+var scorePlayer = new ScorePlayer();
 
 
 var render = function() {
     context.fillStyle = "#000000";
     context.fillRect(0, 0, width, height);
+    context.strokeStyle = "#FFFFFF";
+    context.lineWidth = "5";
+    context.setLineDash([6, 3]);
+    context.beginPath();
+    context.moveTo(300,0);
+    context.lineTo(300, 400);
+    context.stroke();
     player.render();
     computer.render();
     ball.render();
-
+    scorePlayer.render();
+    scoreComputer.render();
 };
 
 /*=============== Paddle ================ */
@@ -64,7 +72,7 @@ Paddle.prototype.move = function(x, y) {
         this.y = 400 -this.height;
         this.y_speed = 0;
     }
-}
+};
 
 
 /*=============== Player ================ */
@@ -114,13 +122,18 @@ Computer.prototype.update = function(ball) {
     }
 };
    
+// Add a random number failure
+
+// So RAND(1..10)
+// if > 7
+//     do nothing
 
 
 /*=============== Ball ================ */
 function Ball(x, y) {
     this.x = x;
     this.y = y;
-    this.x_speed = 2;
+    this.x_speed = 3;
     this.y_speed = 0;
     this.radius = 5;
 }
@@ -132,7 +145,7 @@ Ball.prototype.render = function() {
     context.fill();
 };
 
-Ball.prototype.update = function(paddle1, paddle2) {
+Ball.prototype.update = function(paddle1, paddle2, score) {
     this.x += this.x_speed;
     this.y += this.y_speed;
     var top_x = this.x - 5;
@@ -149,10 +162,19 @@ Ball.prototype.update = function(paddle1, paddle2) {
         this.y_speed = -this.y_speed;
     }
 
-    //Reset ball on scoring
+    //Points scoring and Reset ball on scoring
     if(this.x < 0 || this.x > 600) { //point scored
-         this.x_speed = 2; //Reset direction
+         this.x_speed = 3; //Reset direction
          this.y_speed = 0; //Reset direction
+
+         if(this.x < 0) {
+             scorePlayer.incrementPlayerScore();
+         }
+
+         if(this.x > 600) {
+             scoreComputer.incrementComputerScore();
+         }
+
          this.x = 300; //reset position
          this.y = 200; //reset position
     }
@@ -189,7 +211,37 @@ Ball.prototype.update = function(paddle1, paddle2) {
         }
     }   
 };
+/*=============== Displaying the score ================ */
+function ScorePlayer() {
+    this.playerScore = 0;
+}
 
+function ScoreComputer() {
+    this.computerScore = 0;
+}
+
+
+ScorePlayer.prototype.incrementPlayerScore = function() {
+    this.playerScore++;
+}
+
+ScoreComputer.prototype.incrementComputerScore = function() {
+    this.computerScore++;
+}
+
+ScorePlayer.prototype.render = function() {
+    context.font = "23px Arial";
+    context.fillStyle = "FFFFFF";
+    context.fillText(this.playerScore, 400, 30);
+    context.fillText("Player", 470, 30);
+}
+
+ScoreComputer.prototype.render = function() {
+    context.font = "23px Arial";
+    context.fillStyle = "FFFFFF";
+    context.fillText(this.computerScore, 100, 30);
+    context.fillText("Computer", 150, 30);
+}
 
 /*=============== Displaying it all and event listeners ================ */
 window.onload = function() {
